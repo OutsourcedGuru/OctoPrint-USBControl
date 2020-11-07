@@ -17,30 +17,26 @@ class UsbcontrolPlugin(octoprint.plugin.SettingsPlugin,
 	def get_settings_defaults(self):
 		s =                                     settings()
 		return dict(
-			usb2 =                                True,
-			usb3 =                                True if s.get(["plugins", "usbcontrol", "isRaspi3Bplus"]) else False,
-			usb4 =                                True if s.get(["plugins", "usbcontrol", "isRaspi3Bplus"]) else False,
-			usb5 =                                True if s.get(["plugins", "usbcontrol", "isRaspi3Bplus"]) else False,
+			usb4 =                                True,
 			all =                                 True,
 			init =                                False,
 			isRaspi2B =                           False,
 			isRaspi3B =                           False,
 			isRaspi3Bplus =                       False,
+			isRaspi4B =	                          False,
 			cpuRevision =                         'unknown',
 			piModel =                             'unknown'
 		)
 
 	def get_template_vars(self):
 		return dict(
-			usb2 =                                self._settings.get(["usb2"]),
-			usb3 =                                self._settings.get(["usb3"]),
 			usb4 =                                self._settings.get(["usb4"]),
-			usb5 =                                self._settings.get(["usb5"]),
 			all =                                 self._settings.get(["all"]),
 			init =                                self._settings.get(["init"]),
 			isRaspi2B =                           self._settings.get(["isRaspi2B"]),
 			isRaspi3B =                           self._settings.get(["isRaspi3B"]),
 			isRaspi3Bplus =                       self._settings.get(["isRaspi3Bplus"]),
+			isRaspi4B =                           self._settings.get(["isRaspi4B"]),
 			cpuRevision =                         self._settings.get(["cpuRevision"]),
 			piModel =                             self._settings.get(["piModel"])
 		)
@@ -73,49 +69,16 @@ class UsbcontrolPlugin(octoprint.plugin.SettingsPlugin,
 			s.setBoolean(["plugins", "usbcontrol", "isRaspi2B"],      True if piModel == "Raspi2B" else False)
 			s.setBoolean(["plugins", "usbcontrol", "isRaspi3B"],      True if piModel == "Raspi3B" else False)
 			s.setBoolean(["plugins", "usbcontrol", "isRaspi3Bplus"],  True if piModel == "Raspi3B+" else False)
+			s.setBoolean(["plugins", "usbcontrol", "isRaspi4B"],     True if piModel == "Raspi4B" else False)
 			s.set(["plugins", "usbcontrol", "cpuRevision"],           cpuRevision)
 			s.set(["plugins", "usbcontrol", "piModel"],               piModel)
 			s.save()
-		if command == "usb2":
-			strArg2 =                             "{arg2}".format(**data)
-			try:
-				self._logger.info("usb2 `{}`...".format(strArg2))
-				location =                          "--loc=1-1.1" if self.get_template_vars()['isRaspi3Bplus'] else "--loc=1-1"
-				output =                            call(["sudo", "./uhubctl", location, "--ports=2", "--action=" + strArg2], cwd=uhubctlFolder)
-				if output > 0:
-					self._logger.info("  uhubctrl returned: {}".format(output))
-			except OSError as e:
-				self._logger.info("uhubctl failed, throwing error")
-				output =                            "N/A"
-		if command == "usb3":
-			strArg3 =                             "{arg3}".format(**data)
-			try:
-				self._logger.info("usb3 `{}`...".format(strArg3))
-				location =                          "--loc=1-1.1" if self.get_template_vars()['isRaspi3Bplus'] else "--loc=1-1"
-				self._logger.info("usb3 `{}`...".format(location))
-				output =                            call(["sudo", "./uhubctl", location, "--ports=3", "--action=" + strArg3], cwd=uhubctlFolder)
-				if output > 0:
-					self._logger.info("  uhubctrl returned: {}".format(output))
-			except OSError as e:
-				self._logger.info("uhubctl failed, throwing error")
-				output =                            "N/A"
 		if command == "usb4":
 			strArg4 =                             "{arg4}".format(**data)
 			try:
 				self._logger.info("usb4 `{}`...".format(strArg4))
-				location =                          "--loc=1-1.1" if self.get_template_vars()['isRaspi3Bplus'] else "--loc=1-1"
-				output =                            call(["sudo", "./uhubctl", location, "--ports=4", "--action=" + strArg4], cwd=uhubctlFolder)
-				if output > 0:
-					self._logger.info("  uhubctrl returned: {}".format(output))
-			except OSError as e:
-				self._logger.info("uhubctl failed, throwing error")
-				output =                            "N/A"
-		if command == "usb5":
-			strArg5 =                             "{arg5}".format(**data)
-			try:
-				self._logger.info("usb5 `{}`...".format(strArg5))
-				location =                          "--loc=1-1.1" if self.get_template_vars()['isRaspi3Bplus'] else "--loc=1-1"
-				output =                            call(["sudo", "./uhubctl", location, "--ports=5", "--action=" + strArg5], cwd=uhubctlFolder)
+				location =                          "--loc=1-1"
+				output =                            call(["sudo", "./uhubctl", location, "--ports=1-4", "--action=" + strArg4], cwd=uhubctlFolder)
 				if output > 0:
 					self._logger.info("  uhubctrl returned: {}".format(output))
 			except OSError as e:
@@ -157,6 +120,11 @@ class UsbcontrolPlugin(octoprint.plugin.SettingsPlugin,
 			'a02082': 'Raspi3B',
 			'a22082': 'Raspi3B',
 			'a020d3': 'Raspi3B+',
+			'a03111': 'Raspi4B',
+			'b03111': 'Raspi4B',
+			'b03112': 'Raspi4B',
+			'c03111': 'Raspi4B',
+			'c03112': 'Raspi4B',
 			'9000c1': 'ZeroW',
 			'9000C1': 'ZeroW',
 			'900092': 'Zero',

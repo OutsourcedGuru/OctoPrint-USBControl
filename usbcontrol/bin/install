@@ -7,6 +7,8 @@ if [ $ID -ne 0 ]; then
     echo ""
 else
     ln -s /home/pi/oprint/lib/python2.7/site-packages/usbcontrol/bin/uhubctl /usr/local/bin/uhubctl
+    chown root /home/pi/oprint/lib/python2.7/site-packages/usbcontrol/bin/uhubctl
+    chmod +s /home/pi/oprint/lib/python2.7/site-packages/usbcontrol/bin/uhubctl
     echo "pi ALL=(ALL) NOPASSWD: /home/pi/oprint/lib/python2.7/site-packages/usbcontrol/bin/uhubctl" > /etc/sudoers.d/uhubctl
     echo "If that ran without problems, the plugin should now be ready. Don't forget to press the Save button"
     echo "in the OctoPrint -> Settings -> USBControl page when finished here. Once you've done this then restart"

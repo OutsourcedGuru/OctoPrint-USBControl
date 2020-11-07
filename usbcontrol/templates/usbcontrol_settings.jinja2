@@ -8,7 +8,7 @@
         <h3>{{ _('Setup required') }}</h3>
         <p>First things first, we need to permission the <code>pi</code> user so that it can run the <code>uhubctl</code> executable
             without providing a password.</p>
-        <p>To do this, you'll need to remote into the Raspberry Pi 3B and run the following command:</p>
+        <p>To do this, you'll need to remote into the Raspberry Pi and run the following command:</p>
         <p><code>sudo ~/oprint/lib/python2.7/site-packages/usbcontrol/bin/install</code><br/></p>
         <form class="form-horizontal">
             <label class="og_switch">
@@ -18,57 +18,39 @@
             </label>
         </form>
     </div>
-    <div style='display: {{ 'block' if plugin_usbcontrol_init and (plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B or plugin_usbcontrol_isRaspi3Bplus) else 'none' }}'>
+    <div style='display: {{ 'block' if plugin_usbcontrol_init and (plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B or plugin_usbcontrol_isRaspi3Bplus or plugin_usbcontrol_isRaspi4B) else 'none' }}'>
         <div style="clear:both">
             See the <a href="https://github.com/OutsourcedGuru/OctoPrint-USBControl" target="_blank">README.md</a> for how to set things up.
-            Blue in the slider below indicates that 5V power is ON for the indicated port, the default.<br/><br/>
+            Blue in the slider below indicates that 5V power is ON (default).<br/><br/>
         </div>
         <form class="form-horizontal">
-            <div style='display: {{ 'block' if plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B else 'none' }}'>
-                <h3>Important Raspberry Pi 2B/3B notice!</h3>
-                <p>Given the internal design of the versions <i>before</i> the 3B+, one can only control USB power
-                    inside the Raspberry for either <i>all</i> network adapters (Port 1) or <i>all</i> four ganged USB
-                    ports (Ports 2-5) at once.<br/><br/></p>
+            <div style='display: {{ 'block' }}'>
+                <h3>Important notice!</h3>
+                <p>Given the internal design of Raspberry Pis, all four ports must be turned off/on at once.<br/><br/></p>
             </div>
-            <label class="og_switch">
-                <input id="idUSB2" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.usb2, click: togglePower2">
-                <span class="og_slider round"></span>
-                <span class="theLabel" style="white-space:nowrap">{{ _('USB&nbsp;2') }} {{'<i class="fa fa-arrow-left"></i> Raspi 2B/3B = all four ports' if plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B else ''}}</span>
-            </label>
             <br/>
-            <label class="og_switch">
-                <input id="idUSB3" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.usb3, click: togglePower3" {{'disabled' if plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B else ''}}>
-                <span class="og_slider round"></span>
-                <span class="theLabel">{{ _('USB&nbsp;3') }}</span>
-            </label>
-            <div style='display: {{ 'block' if plugin_usbcontrol_isRaspi3Bplus else 'none' }}'>
+            <div style='display: {{ 'none' if plugin_usbcontrol_isRaspi4B else 'block' }}'>
             <br/>
             <label class="og_switch">
                 <input id="idUSBAll" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.all, click: togglePowerAll">
                 <span class="og_slider round"></span>
-                <span class="theLabel">{{ _('All&nbsp;USB') }}</span>
+                <span class="theLabel">{{ _('USB Power') }}</span>
             </label>
             </div>
-            <div style='display: {{ 'none' if plugin_usbcontrol_isRaspi3Bplus else 'block' }}'>
+            <div style='display: {{ 'block' if plugin_usbcontrol_isRaspi4B else 'none' }}'>
             <br/>
             <label class="og_switch">
-                <input id="idUSB4" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.usb4, click: togglePower4" {{'disabled' if plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B else ''}}>
+                <input id="idUSB4" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.usb4, click: togglePower4">
                 <span class="og_slider round"></span>
-                <span class="theLabel">{{ _('USB&nbsp;4') }}</span>
-            </label>
-            <br/>
-            <label class="og_switch">
-                <input id="idUSB5" type="checkbox" data-bind="checked: settings.plugins.usbcontrol.usb5, click: togglePower5" {{'disabled' if plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B else ''}}>
-                <span class="og_slider round"></span>
-                <span class="theLabel">{{ _('USB&nbsp;5') }}</span>
+                <span class="theLabel">{{ _('USB Power') }}</span>
             </label>
             </div>
         </form>
     </div>
-    <div style='display: {{ 'none' if (not plugin_usbcontrol_init) or (plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B or plugin_usbcontrol_isRaspi3Bplus) else 'block' }}'>
+    <div style='display: {{ 'none' if (not plugin_usbcontrol_init) or (plugin_usbcontrol_isRaspi2B or plugin_usbcontrol_isRaspi3B or plugin_usbcontrol_isRaspi3Bplus or plugin_usbcontrol_isRaspi4B) else 'block' }}'>
         <div style="clear:both">
             <code>It looks like your OctoPrint is installed on something other than a Raspberry Pi 2B,<br/>
-            3B or 3B+ and therefore isn't compatible with this plugin.</code><br/><br/>
+            3B, 3B+, 4B and therefore isn't compatible with this plugin.</code><br/><br/>
         </div>
     </div>
     <table><tr><td valign="top"><h3>{{ _('Why this might be useful') }}</h3>
@@ -85,7 +67,7 @@
         </ol>
         <p>It turns out that you can programmatically turn off the 5V pin on a per-port basis. That's the approach that I'm taking here instead
             of using tape.</p>
-        <p>This plugin uses <b>uhubctl</b> to turn USB power off and on. In addition to Raspberry Pi 2B, 3B and 3B+ it supports other USB hubs - refer
+        <p>This plugin uses <b>uhubctl</b> to turn USB power off and on. In addition to Raspberry Pi 2B, 3B, 3B+, and 4B it supports other USB hubs - refer
             to the list of supported devices on the <a href="https://github.com/mvp/uhubctl" target="_blank">uhubctl home page</a>.</p>
         </td><td width="50%" valign="top" align="right">
             <a href="https://github.com/OutsourcedGuru" target="_blank"><img src="plugin/usbcontrol/static/img/profile.png"></a>
